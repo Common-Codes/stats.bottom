@@ -1,0 +1,9 @@
+body{
+    background-color: darkslategrey;
+    color: antiquewhite;
+}
+
+#logo-img {
+    height: 64px;
+    width: 64px;
+}
