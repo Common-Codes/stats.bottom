@@ -10,15 +10,20 @@
     <link rel="icon" href="https://tallerthanshort.github.io/ut3.ggpht/icons/Bottom_new.png" data-react-helmet="true">
     <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-firestore.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
 </head>
 <body>
     <div id="logo">
         <img id="logo-img" src="https://tallerthanshort.github.io/ut3.ggpht/icons/Bottom_new.png">
     </div>
     <div id="graph">
-        <p>Approvals</p>
+        <p>Amount of Bots Reviewed (daily)</p>
         <div id="approval-graph">
             <p>Loading...</p>
+        </div>
+        <button onclick="setupVisuals()">Visual Graphs</button>
+        <div id="size-limiter" style="height: 170px; width: 700px;">
+            <canvas id="real-graph" width="70" height="8"></canvas>
         </div>
     </div>
     <script type="text/javascript">
@@ -37,6 +42,9 @@
     </script>
     <script type="text/javascript">
         const graph = document.getElementById("approval-graph");
+        let startTime = ''
+        startTime = Date.now()
+        console.log("started")
 
         db.collection('approvals').get().then(snapshot => {
                 setupGraph(snapshot.docs);
@@ -47,12 +55,57 @@
             data.forEach(doc => {
                 const week = doc.data();
                 const li = `
-                <p>${week.day} : ${week.value}</p>
+                <p id="${week.day}">${week.value}</p>
                 `;
                 html += li
             });
             graph.innerHTML = html;
         }
+    </script>
+    <script>
+        function setupVisuals() {
+            if(Date.now() - startTime > 1238){
+                const ctx = document.getElementById('real-graph').getContext('2d');
+            const myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                    datasets: [{
+                        label: 'Reviewals',
+                        data: [document.getElementById('Monday').innerText, document.getElementById('Tuesday').innerText, document.getElementById('Wednesday').innerText, document.getElementById('Thursday').innerText, document.getElementById('Friday').innerText, document.getElementById('Saturday').innerText, document.getElementById('Sunday').innerText],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        } else {
+            return;
+        }
+            }
     </script>
 
     
