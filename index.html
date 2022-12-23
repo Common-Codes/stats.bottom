@@ -16,15 +16,16 @@
     <div id="logo">
         <img id="logo-img" src="https://tallerthanshort.github.io/ut3.ggpht/icons/Bottom_new.png">
     </div>
-    <div id="graph">
+    <div id="graph" style="height: 170px; width: 700px;">
         <p>Amount of Bots Reviewed (daily)</p>
         <div id="approval-graph">
             <p>Loading...</p>
         </div>
-        <button onclick="setupVisuals()">Visual Graphs</button>
-        <div id="size-limiter" style="height: 170px; width: 700px;">
-            <canvas id="real-graph" width="70" height="8"></canvas>
-        </div>
+        <canvas id="real-graph" width="70" height="9"></canvas>
+    </div>
+    <div id="individual" style="margin-top: 290px;">
+        <b>Individual reviewer quota (monthly)</b>
+        <div id="scoregrid" style="display: grid; grid-template-columns: auto auto auto; padding: 10px;"></div>
     </div>
     <script type="text/javascript">
         const firebaseConfig = {
@@ -42,13 +43,35 @@
     </script>
     <script type="text/javascript">
         const graph = document.getElementById("approval-graph");
+        const yeet = document.getElementById("scoregrid");
         let startTime = ''
         startTime = Date.now()
-        console.log("started")
 
         db.collection('approvals').get().then(snapshot => {
                 setupGraph(snapshot.docs);
+        });
+
+        db.collection('users').get().then(snapshot => {
+                setupYousers(snapshot.docs);
+        });
+
+        const setupYousers = (data) => {
+            let html = ``
+            data.forEach(doc => {
+                const user = doc.data();
+                const grid = `
+                <div style="padding: 20px;">
+                    <b>${user.name}</b>
+                    <div>
+                        <label for="asd">${user.reviewed}/${user.needed}</label>
+                        <progress id="asd" value="${user.reviewed}" max="${user.needed}"></progress>
+                    </div>
+                </div>
+                `
+                html += grid;
             });
+            yeet.innerHTML = html;
+        }
         
         const setupGraph = (data) => {
             let html = ``
@@ -63,9 +86,9 @@
         }
     </script>
     <script>
+        setTimeout(function(){setupVisuals()}, 1000)
         function setupVisuals() {
-            if(Date.now() - startTime > 1238){
-                const ctx = document.getElementById('real-graph').getContext('2d');
+            const ctx = document.getElementById('real-graph').getContext('2d');
             const myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -102,10 +125,7 @@
                     maintainAspectRatio: false
                 }
             });
-        } else {
-            return;
         }
-            }
     </script>
 
     
